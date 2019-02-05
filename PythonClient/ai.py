@@ -62,7 +62,7 @@ class AI(RealtimeAI):
                 self._agent_print(agent.id, 'Random Move')
                 self.move(agent.id, random.choice(self._empty_directions(agent.position)))
             else:
-                self._agent_print(agent.id, 'Start Bomb Operation')
+                self._agent_print(agent.id, 'StarT Bomb Operation')
                 if self.my_side == 'Police':
                     self.defuse(agent.id, bombsite_direction)
                 else:
