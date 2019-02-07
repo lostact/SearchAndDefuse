@@ -2,6 +2,7 @@
 
 # python imports
 import random
+from collections import deque
 
 # chillin imports
 from chillin_client import RealtimeAI
@@ -57,8 +58,9 @@ class AI(RealtimeAI):
                 continue
 
             if agent.id == 0:
+                _, visions = self._dls(agent.position, self.world.constants.police_vision_distance)
+
                 path = self._a_star(agent.position, Position(x=21, y=1), self.VALID_WALK_ECELLS)
-                self._agent_print(agent.id, path)
                 if path is not None and len(path) >= 2: # one element is start position
                     direction = agent.position.direction_to(Position.from_tuple(path[len(path) - 2])) # last element is start position
                     self._agent_print(agent.id, 'Path Move {}'.format(direction))
@@ -140,6 +142,7 @@ class AI(RealtimeAI):
         return final_path
 
 
+    # Return the path as list of tuples (x, y)
     def _a_star(self, start_position, goal_position, valid_ecells):
         start = start_position.to_tuple()
         goal = goal_position.to_tuple()
@@ -185,3 +188,42 @@ class AI(RealtimeAI):
     # positions are in tuple form
     def _heuristic(self, current, goal):
         return abs(current[0] - goal[0]) + abs(current[1] - goal[1])
+
+
+    # depth limited search, return the depth and list of visited positions
+    def _dls(self, start_position, max_depth, goal_position=None, valid_ecells=None):
+        if goal_position is not None and goal_position == start_position:
+            return 0, []
+
+        positions = deque([start_position])
+        depths = deque([0])
+        visited = [start_position]
+
+        while len(positions) > 0:
+            pos = positions.popleft()
+            depth = depths.popleft()
+
+            if max_depth is None or depth < max_depth:
+                # Check neighbours
+                neighbours = pos.get_neighbours(self.world)
+                for neighbour in neighbours:
+                    # Check ecell
+                    board_ecell = self.world.board[neighbour.y][neighbour.x]
+                    if valid_ecells is not None and self.world.board[neighbour.y][neighbour.x] not in valid_ecells:
+                        continue
+                    # Check visited
+                    if neighbour in visited:
+                        continue
+
+                    # Update visited
+                    visited.append(neighbour)
+
+                    # Check goal
+                    if not goal_position is None and neighbour == goal_position:
+                        return depth + 1, visited
+
+                    # Update queue
+                    positions.append(neighbour)
+                    depths.append(depth + 1)
+
+        return None, visited

@@ -43,10 +43,15 @@ def _position_direction_to(self, next_pos):
         return ECommandDirection.Left if delta_x < 0 else ECommandDirection.Right
 
 
+def _position_repr(self):
+    return 'Position: {}, {}'.format(self.x, self.y)
+
+
 Position.__eq__ = _position_is_equal
 Position.get_neighbours = _position_get_neighbours
 Position.is_neighbour = _position_is_neighbour
 Position.to_tuple = _position_to_tuple
 Position.from_tuple = _position_from_tuple
 Position.direction_to = _position_direction_to
+Position.__repr__ = _position_repr
 # End Position
