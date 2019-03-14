@@ -1,1 +1,1 @@
-# SearchAndDefuse
+This is my AI for [Chillin Wars](https://www.chillinwars.ir) 2019 senior game [SearchAndDefuse](https://github.com/Chillin-Examples/SearchAndDefuse) written in python2.
